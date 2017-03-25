@@ -9,6 +9,33 @@
 import Photos
 
 
+enum GalleryObjectSource {
+    case library
+    case cloud
+    case iTunes
+    
+    init(sourceType: PHAssetSourceType) {
+        if sourceType == .typeCloudShared {
+            self = .cloud
+        } else if sourceType == .typeiTunesSynced {
+            self = .iTunes
+        } else {
+            self = .library
+        }
+    }
+    
+    var canDelete: Bool {
+        return self != .iTunes
+    }
+    
+    var canEdit: Bool {
+        return self == .library
+    }
+    
+}
+
+
+
 /// Base class of gallery object.
 open class BaseGalleryObject {
 
@@ -18,41 +45,44 @@ open class BaseGalleryObject {
         self.asset = asset
     }
 
-}
 
-// MARK: Object properties
+    // MARK: Object properties
 
-extension BaseGalleryObject {
 
+    /// Source of object
+    lazy var source: GalleryObjectSource = {
+        return GalleryObjectSource(sourceType: self.asset.sourceType)
+    }()
+    
     /// Pixel size of object
-    var size: CGSize {
-        return CGSize(width: asset.pixelWidth, height: asset.pixelHeight)
-    }
+    lazy var size: CGSize = {
+        return CGSize(width: self.asset.pixelWidth, height: self.asset.pixelHeight)
+    }()
     
     /// Creation date of object
-    var creationDate: Date? {
-        return asset.creationDate
-    }
+    lazy var creationDate: Date? = {
+        return self.asset.creationDate
+    }()
     
     /// Modification date of object
-    var modificationDate: Date? {
-        return asset.modificationDate
-    }
+    lazy var modificationDate: Date? = {
+        return self.asset.modificationDate
+    }()
     
     /// The location saved with the object
-    var location: CLLocation? {
-        return asset.location
-    }
+    lazy var location: CLLocation? = {
+        return self.asset.location
+    }()
     
     /// A boolean value that indicates whether the user has hidden the object
-    var isHidden: Bool {
-        return asset.isHidden
-    }
+    lazy var isHidden: Bool = {
+        return self.asset.isHidden
+    }()
     
     /// A Boolean value that indicates whether the user has marked the asset as a favorite
-    var isFavorite: Bool {
-        return asset.isFavorite
-    }
+    lazy var isFavorite: Bool = {
+        return self.asset.isFavorite
+    }()
 
 }
 

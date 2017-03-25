@@ -40,11 +40,44 @@ enum PhotoSubtype {
     
 }
 
+enum BurstSelectionType {
+    case none
+    case userPick
+    case autoPick
+    case both
+    
+    init(burstSelectionTypes: PHAssetBurstSelectionType) {
+        if burstSelectionTypes.contains(.userPick) && burstSelectionTypes.contains(.autoPick) {
+            self = .both
+        } else if burstSelectionTypes.contains(.userPick) {
+            self = .userPick
+        } else if burstSelectionTypes.contains(.autoPick) {
+            self = .autoPick
+        } else {
+            self = .none
+        }
+    }
+    
+}
+
 
 open class Photo: BaseGalleryObject {
 
+    struct BurstInfo {
+        let representsBurst: Bool
+        let burstIdentifier: String?
+        let burstSelectionTypes: BurstSelectionType
+    }
+    
+    
     lazy var subtypes: [PhotoSubtype] = {
         return PhotoSubtype.subtypes(from: self.asset.mediaSubtypes)
+    }()
+    
+    lazy var burstInfo: BurstInfo = {
+        return BurstInfo(representsBurst: self.asset.representsBurst,
+                         burstIdentifier: self.asset.burstIdentifier,
+                         burstSelectionTypes: BurstSelectionType(burstSelectionTypes: self.asset.burstSelectionTypes))
     }()
 
 }
