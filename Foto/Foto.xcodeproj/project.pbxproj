@@ -11,6 +11,7 @@
 		96744C1D1E86FCC30057F305 /* FotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C1C1E86FCC30057F305 /* FotoTests.swift */; };
 		96744C1F1E86FCC30057F305 /* Foto.h in Headers */ = {isa = PBXBuildFile; fileRef = 96744C111E86FCC30057F305 /* Foto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96744C2B1E86FFD20057F305 /* BaseGalleryObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2A1E86FFD20057F305 /* BaseGalleryObject.swift */; };
+		96744C2D1E8702450057F305 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2C1E8702450057F305 /* Photo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +32,7 @@
 		96744C1C1E86FCC30057F305 /* FotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FotoTests.swift; sourceTree = "<group>"; };
 		96744C1E1E86FCC30057F305 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96744C2A1E86FFD20057F305 /* BaseGalleryObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseGalleryObject.swift; sourceTree = "<group>"; };
+		96744C2C1E8702450057F305 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				96744C2A1E86FFD20057F305 /* BaseGalleryObject.swift */,
+				96744C2C1E8702450057F305 /* Photo.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96744C2D1E8702450057F305 /* Photo.swift in Sources */,
 				96744C2B1E86FFD20057F305 /* BaseGalleryObject.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

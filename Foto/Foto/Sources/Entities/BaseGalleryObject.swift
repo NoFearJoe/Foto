@@ -10,9 +10,9 @@ import Photos
 
 
 /// Base class of gallery object.
-class BaseGalleryObject {
+open class BaseGalleryObject {
 
-    fileprivate let asset: PHAsset
+    let asset: PHAsset
     
     init(asset: PHAsset) {
         self.asset = asset
@@ -20,7 +20,7 @@ class BaseGalleryObject {
 
 }
 
-// MARK: Asset properties
+// MARK: Object properties
 
 extension BaseGalleryObject {
 
@@ -52,6 +52,16 @@ extension BaseGalleryObject {
     /// A Boolean value that indicates whether the user has marked the asset as a favorite
     var isFavorite: Bool {
         return asset.isFavorite
+    }
+
+}
+
+// MARK: Object methods
+
+extension BaseGalleryObject {
+
+    open func canPerform(_ editOperation: PHAssetEditOperation) -> Bool {
+        return asset.canPerform(editOperation)
     }
 
 }
