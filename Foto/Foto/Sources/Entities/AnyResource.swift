@@ -35,6 +35,10 @@ enum ResourceSource {
 }
 
 
+public protocol AnyResourceStore {
+    func remove(object: AnyResource)
+}
+
 
 /// Base class of gallery object.
 open class AnyResource {
@@ -44,12 +48,15 @@ open class AnyResource {
     
     let asset: PHAsset
     
+    let store: AnyResourceStore
+    
     
     var pendingRequests: [PHImageRequestID] = []
     
     
-    init(asset: PHAsset) {
+    init(asset: PHAsset, store: AnyResourceStore) {
         self.asset = asset
+        self.store = store
     }
 
 
@@ -100,6 +107,10 @@ extension AnyResource {
     open func canPerform(_ editOperation: PHAssetEditOperation) -> Bool {
         return asset.canPerform(editOperation)
     }
+    
+    open func remove() {
+        store.remove(object: self)
+    }
 
 }
 
@@ -128,7 +139,7 @@ extension AnyResource {
 
 // MARK: Load request cancellation
 
-extension Photo {
+extension AnyResource {
     
     func cancelLastRequest() {
         performPendignRequestsChange {

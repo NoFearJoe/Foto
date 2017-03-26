@@ -214,15 +214,15 @@ extension Album {
         fetchResult.enumerateObjects({ (asset, index, stop) in
             switch asset.mediaType {
             case .image:
-                if let object = Photo(asset: asset) as? T {
+                if let object = Photo(asset: asset, store: self) as? T {
                     acc.append(object)
-                } else if let object = AnyResource(asset: asset) as? T {
+                } else if let object = AnyResource(asset: asset, store: self) as? T {
                     acc.append(object)
                 }
             case .video:
-                if let object = Video(asset: asset) as? T {
+                if let object = Video(asset: asset, store: self) as? T {
                     acc.append(object)
-                } else if let object = AnyResource(asset: asset) as? T {
+                } else if let object = AnyResource(asset: asset, store: self) as? T {
                     acc.append(object)
                 }
             default: break
@@ -236,9 +236,9 @@ extension Album {
 
 // MARK: Object deletion
 
-extension Album {
-
-    public func remove(objects: [T]) {
+extension Album: AnyResourceStore {
+    
+    public func remove(objects: [AnyResource]) {
         state = .process(type: .deletion)
 
         PHPhotoLibrary.shared().performChanges({ () -> Void in
@@ -251,7 +251,7 @@ extension Album {
         })
     }
     
-    public func remove(object: T) {
+    public func remove(object: AnyResource) {
         remove(objects: [object])
     }
     
