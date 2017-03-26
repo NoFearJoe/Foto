@@ -44,3 +44,30 @@ open class Video: BaseGalleryObject {
     }()
 
 }
+
+// MARK: Content loading
+
+extension Video {
+ 
+    func loadVideo(quality: PHVideoRequestOptionsDeliveryMode = .automatic, completion: @escaping (AVPlayerItem?) -> Void) {
+        let requestOptions = PHVideoRequestOptions()
+        requestOptions.version = .current
+        requestOptions.deliveryMode = quality
+        requestOptions.isNetworkAccessAllowed = true
+        
+        var requestID: PHImageRequestID = -1
+        requestID = PHImageManager.default().requestPlayerItem(forVideo: self.asset,
+                                                               options: requestOptions,
+                                                               resultHandler:
+        { [weak self] (playerItem, info) in
+            self?.removePendingRequest(with: requestID)
+            
+            completion(playerItem)
+        })
+        
+        performPendignRequestsChange {
+            pendingRequests.append(requestID)
+        }
+    }
+    
+}

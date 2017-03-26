@@ -9,7 +9,7 @@
 import Photos
 
 
-enum PhotoSubtype {
+public enum PhotoSubtype {
     case panorama
     case hdr
     case screenshot
@@ -40,7 +40,7 @@ enum PhotoSubtype {
     
 }
 
-enum BurstSelectionType {
+public enum BurstSelectionType {
     case none
     case userPick
     case autoPick
@@ -63,21 +63,95 @@ enum BurstSelectionType {
 
 open class Photo: BaseGalleryObject {
 
-    struct BurstInfo {
+    public struct BurstInfo {
         let representsBurst: Bool
         let burstIdentifier: String?
         let burstSelectionTypes: BurstSelectionType
     }
     
     
-    lazy var subtypes: [PhotoSubtype] = {
+    lazy public var subtypes: [PhotoSubtype] = {
         return PhotoSubtype.subtypes(from: self.asset.mediaSubtypes)
     }()
     
-    lazy var burstInfo: BurstInfo = {
+    lazy public var burstInfo: BurstInfo = {
         return BurstInfo(representsBurst: self.asset.representsBurst,
                          burstIdentifier: self.asset.burstIdentifier,
                          burstSelectionTypes: BurstSelectionType(burstSelectionTypes: self.asset.burstSelectionTypes))
     }()
+    
+}
+
+
+// MARK: Content loading
+
+public extension Photo {
+
+    public func loadImage(size: CGSize, contentMode: PHImageContentMode = .default, completion: @escaping (UIImage?) -> Void) {
+        let requestOptions = PHImageRequestOptions()
+        requestOptions.version = .current
+        requestOptions.deliveryMode = .opportunistic
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.isSynchronous = true
+        
+        var requestID: PHImageRequestID = -1
+        requestID = PHImageManager.default().requestImage(for: self.asset,
+                                                              targetSize: size,
+                                                              contentMode: contentMode,
+                                                              options: requestOptions)
+        { [weak self] (image, info) in
+            self?.removePendingRequest(with: requestID)
+            
+            completion(image)
+        }
+        
+        performPendignRequestsChange {
+            pendingRequests.append(requestID)
+        }
+    }
+    
+    public func loadImageData(completion: @escaping (Data?) -> Void) {
+        let requestOptions = PHImageRequestOptions()
+        requestOptions.version = .current
+        requestOptions.deliveryMode = .opportunistic
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.isSynchronous = true
+        
+        var requestID: PHImageRequestID = -1
+        requestID = PHImageManager.default().requestImageData(for: self.asset,
+                                                  options: requestOptions)
+        { [weak self] (data, UTI, imageOrientation, info) in
+            self?.removePendingRequest(with: requestID)
+            
+            completion(data)
+        }
+        
+        performPendignRequestsChange {
+            pendingRequests.append(requestID)
+        }
+    }
+    
+    @available(iOS 9.1, *)
+    public func loadLivePhoto(size: CGSize, contentMode: PHImageContentMode = .default, completion: @escaping (PHLivePhoto?) -> Void) {
+        let requestOptions = PHLivePhotoRequestOptions()
+        requestOptions.version = .current
+        requestOptions.deliveryMode = .opportunistic
+        requestOptions.isNetworkAccessAllowed = true
+        
+        var requestID: PHImageRequestID = -1
+        requestID = PHImageManager.default().requestLivePhoto(for: self.asset,
+                                                  targetSize: size,
+                                                  contentMode: contentMode,
+                                                  options: requestOptions)
+        { [weak self] (livePhoto, info) in
+            self?.removePendingRequest(with: requestID)
+            
+            completion(livePhoto)
+        }
+        
+        performPendignRequestsChange {
+            pendingRequests.append(requestID)
+        }
+    }
 
 }

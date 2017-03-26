@@ -41,6 +41,10 @@ open class BaseGalleryObject {
 
     let asset: PHAsset
     
+    
+    var pendingRequests: [PHImageRequestID] = []
+    
+    
     init(asset: PHAsset) {
         self.asset = asset
     }
@@ -94,4 +98,43 @@ extension BaseGalleryObject {
         return asset.canPerform(editOperation)
     }
 
+}
+
+
+// MARK: Pending requests managing
+
+extension BaseGalleryObject {
+
+    func performPendignRequestsChange(_ change: () -> Void) {
+        objc_sync_enter(self)
+        
+        change()
+        
+        objc_sync_exit(self)
+    }
+    
+    func removePendingRequest(with id: PHImageRequestID) {
+        performPendignRequestsChange {
+            if let index = pendingRequests.index(of: id) {
+                pendingRequests.remove(at: index)
+            }
+        }
+    }
+
+}
+
+// MARK: Load request cancellation
+
+extension Photo {
+    
+    func cancelLastRequest() {
+        performPendignRequestsChange {
+            guard let lastRequestID = pendingRequests.last else { return }
+            
+            PHImageManager.default().cancelImageRequest(lastRequestID)
+            
+            pendingRequests.removeLast()
+        }
+    }
+    
 }
