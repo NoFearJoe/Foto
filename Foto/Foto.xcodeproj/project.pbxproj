@@ -10,6 +10,10 @@
 		96744C181E86FCC30057F305 /* Foto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96744C0E1E86FCC30057F305 /* Foto.framework */; };
 		96744C1D1E86FCC30057F305 /* FotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C1C1E86FCC30057F305 /* FotoTests.swift */; };
 		96744C1F1E86FCC30057F305 /* Foto.h in Headers */ = {isa = PBXBuildFile; fileRef = 96744C111E86FCC30057F305 /* Foto.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96744C2B1E86FFD20057F305 /* AnyResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2A1E86FFD20057F305 /* AnyResource.swift */; };
+		96744C2D1E8702450057F305 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2C1E8702450057F305 /* Photo.swift */; };
+		96744C2F1E8707550057F305 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2E1E8707550057F305 /* Video.swift */; };
+		96744C311E878AAC0057F305 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C301E878AAC0057F305 /* Album.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +33,10 @@
 		96744C171E86FCC30057F305 /* FotoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FotoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96744C1C1E86FCC30057F305 /* FotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FotoTests.swift; sourceTree = "<group>"; };
 		96744C1E1E86FCC30057F305 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		96744C2A1E86FFD20057F305 /* AnyResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyResource.swift; sourceTree = "<group>"; };
+		96744C2C1E8702450057F305 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		96744C2E1E8707550057F305 /* Video.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
+		96744C301E878AAC0057F305 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,8 +98,20 @@
 		96744C281E86FD4E0057F305 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				96744C291E86FEB90057F305 /* Entities */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		96744C291E86FEB90057F305 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				96744C2A1E86FFD20057F305 /* AnyResource.swift */,
+				96744C2C1E8702450057F305 /* Photo.swift */,
+				96744C2E1E8707550057F305 /* Video.swift */,
+				96744C301E878AAC0057F305 /* Album.swift */,
+			);
+			path = Entities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -157,6 +177,7 @@
 					96744C0D1E86FCC30057F305 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 485UNLA592;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					96744C161E86FCC30057F305 = {
@@ -206,6 +227,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96744C2D1E8702450057F305 /* Photo.swift in Sources */,
+				96744C2F1E8707550057F305 /* Video.swift in Sources */,
+				96744C2B1E86FFD20057F305 /* AnyResource.swift in Sources */,
+				96744C311E878AAC0057F305 /* Album.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +355,7 @@
 		96744C231E86FCC30057F305 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 485UNLA592;
@@ -343,6 +369,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.mesterra.Foto;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -350,6 +377,7 @@
 		96744C241E86FCC30057F305 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 485UNLA592;
@@ -370,6 +398,7 @@
 		96744C261E86FCC30057F305 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = 485UNLA592;
 				INFOPLIST_FILE = FotoTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -382,6 +411,7 @@
 		96744C271E86FCC30057F305 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = 485UNLA592;
 				INFOPLIST_FILE = FotoTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
