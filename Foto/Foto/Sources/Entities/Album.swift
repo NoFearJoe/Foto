@@ -40,10 +40,27 @@ public enum AlbumState {
         case deletion
         case fetching
         case saving
+        
+        var description: String {
+            switch self {
+            case .deletion: return "Deletion"
+            case .fetching: return "Fetching"
+            case .saving: return "Saving"
+            }
+        }
+        
     }
     
     case process(type: ActionType)
     case idle
+    
+    var description: String {
+        switch self {
+        case .idle: return "Idle"
+        case .process(let type): return type.description
+        }
+    }
+    
 }
 
 
@@ -113,17 +130,21 @@ open class Album<T: AnyResource> {
     }
     
     
-    public class func createAlbum(title: String) {
+    public class func createAlbum(title: String, completion: @escaping (Bool, Error?) -> Void) {
         let options = PHFetchOptions()
         options.predicate = NSPredicate(format: "title = %@", title)
         let assetCollection = PHAssetCollection.fetchAssetCollections(with: AlbumType.custom(title: title).collectionType,
-                                                                  subtype: .any,
-                                                                  options: options).firstObject
+                                                                      subtype: .any,
+                                                                      options: options).firstObject
         
         if assetCollection == nil {
             PHPhotoLibrary.shared().performChanges({
                 PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: title)
-            }, completionHandler: nil)
+            }, completionHandler: { (success, error) in
+                completion(success, error)
+            })
+        } else {
+            completion(true, nil)
         }
     }
     
@@ -221,9 +242,12 @@ extension Album {
         state = .process(type: .deletion)
 
         PHPhotoLibrary.shared().performChanges({ () -> Void in
-            PHAssetChangeRequest.deleteAssets(objects as NSFastEnumeration)
+            let assets = objects.map { $0.asset }
+            PHAssetChangeRequest.deleteAssets(assets as NSFastEnumeration)
         }, completionHandler: { [weak self] (success, error) -> Void in
-//            self?.refetch()
+            if !success {
+                self?.state = .idle
+            }
         })
     }
     
@@ -278,7 +302,11 @@ extension Album {
         default:
             PHPhotoLibrary.shared().performChanges({ () -> Void in
                 PHAssetCreationRequest.forAsset().addResource(with: PHAssetResourceType.fullSizePhoto, data: data, options: nil)
-            }, completionHandler: nil)
+            }, completionHandler: { [weak self] (success, error) -> Void in
+                if !success {
+                    self?.state = .idle
+                }
+            })
         }
     }
 
