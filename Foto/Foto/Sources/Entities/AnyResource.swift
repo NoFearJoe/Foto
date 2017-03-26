@@ -1,5 +1,5 @@
 //
-//  BaseGalleryObject.swift
+//  AnyResource.swift
 //  Foto
 //
 //  Created by Ilya Kharabet on 25.03.17.
@@ -9,7 +9,7 @@
 import Photos
 
 
-enum GalleryObjectSource {
+enum ResourceSource {
     case library
     case cloud
     case iTunes
@@ -37,8 +37,11 @@ enum GalleryObjectSource {
 
 
 /// Base class of gallery object.
-open class BaseGalleryObject {
+open class AnyResource {
 
+    public class var mediaType: PHAssetMediaType { return .unknown }
+    
+    
     let asset: PHAsset
     
     
@@ -54,8 +57,8 @@ open class BaseGalleryObject {
 
 
     /// Source of object
-    lazy var source: GalleryObjectSource = {
-        return GalleryObjectSource(sourceType: self.asset.sourceType)
+    lazy var source: ResourceSource = {
+        return ResourceSource(sourceType: self.asset.sourceType)
     }()
     
     /// Pixel size of object
@@ -92,7 +95,7 @@ open class BaseGalleryObject {
 
 // MARK: Object methods
 
-extension BaseGalleryObject {
+extension AnyResource {
 
     open func canPerform(_ editOperation: PHAssetEditOperation) -> Bool {
         return asset.canPerform(editOperation)
@@ -103,7 +106,7 @@ extension BaseGalleryObject {
 
 // MARK: Pending requests managing
 
-extension BaseGalleryObject {
+extension AnyResource {
 
     func performPendignRequestsChange(_ change: () -> Void) {
         objc_sync_enter(self)

@@ -10,11 +10,13 @@ import Photos
 
 
 public enum AlbumType {
+    case composite
     case system(subtype: PHAssetCollectionSubtype)
     case custom(title: String)
     
     var collectionType: PHAssetCollectionType {
         switch self {
+        case .composite: return .album
         case .system(let subtype):
             switch subtype {
             case .albumRegular, .albumSyncedEvent, .albumSyncedFaces, .albumSyncedAlbum, .albumImported:
@@ -31,19 +33,31 @@ public enum AlbumType {
     
 }
 
+// MARK: Album
 
-open class Album<T: BaseGalleryObject> {
+open class Album<T: AnyResource> {
 
     let assetCollection: PHAssetCollection?
+    let albumType: AlbumType
+    
+    var objects: [T] = [] {
+        didSet {
+            objectsRetrieved?(objects)
+        }
+    }
     
     
-    var objects: [T] = []
+    public var objectsRetrieved: (([T]) -> Void)?
     
     
     fileprivate let observer: AlbumFetchResultObserver<PHAsset>
     fileprivate var fetchResult: PHFetchResult<PHAsset>? {
         didSet {
             observer.fetchResult = self.fetchResult
+            
+            guard let fetchResult = self.fetchResult else { return }
+            
+            self.objects = self.mapFetchResult(fetchResult: fetchResult)
         }
     }
     
@@ -51,7 +65,11 @@ open class Album<T: BaseGalleryObject> {
     
     
     public init(albumType: AlbumType) {
+        self.albumType = albumType
+        
         switch albumType {
+        case .composite:
+            assetCollection = nil
         case .system(let subtype):
             assetCollection = PHAssetCollection.fetchAssetCollections(with: albumType.collectionType,
                                                                       subtype: subtype,
@@ -70,22 +88,50 @@ open class Album<T: BaseGalleryObject> {
     }
     
     
-    public func fetch(options: PHFetchOptions? = nil, completion: (([T]) -> Void)?) {
+    func fetchResultChanged(_ newFetchResult: PHFetchResult<PHAsset>) {
         queue.async { [weak self] in
-            defer {
-                completion?(self?.objects ?? [])
-            }
-            
-            guard let `self` = self, let collection = self.assetCollection else { return }
-            
-            self.fetchResult = PHAsset.fetchAssets(in: collection, options: options)
-            
-            guard let fetchResult = self.fetchResult else { return }
-            
-            self.objects = self.mapFetchResult(fetchResult: fetchResult)
+            self?.fetchResult = newFetchResult
         }
     }
+
+}
+
+// MARK: Fetching
+
+extension Album {
+
+    public func fetchByCreationDate(ascending: Bool = false) {
+        let options = PHFetchOptions()
+        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: ascending)]
+        if T.self != AnyResource.self {
+            options.predicate = NSPredicate(format: "mediaType == %d", T.mediaType.rawValue)
+        }
+        
+        fetch(options: options)
+    }
     
+    
+    public func fetch(options: PHFetchOptions? = nil) {
+        queue.async { [weak self] in
+            guard let `self` = self else { return }
+            
+            switch self.albumType {
+            case .composite:
+                if let collection = self.assetCollection {
+                    self.fetchResult = PHAsset.fetchAssets(in: collection, options: options)
+                }
+            default:
+                self.fetchResult = PHAsset.fetchAssets(with: T.mediaType, options: options)
+            }
+        }
+    }
+
+}
+
+// MARK: Fetch result mapping
+
+extension Album {
+
     func mapFetchResult(fetchResult: PHFetchResult<PHAsset>) -> [T] {
         var acc: [T] = []
         
@@ -94,13 +140,13 @@ open class Album<T: BaseGalleryObject> {
             case .image:
                 if let object = Photo(asset: asset) as? T {
                     acc.append(object)
-                } else if let object = BaseGalleryObject(asset: asset) as? T {
+                } else if let object = AnyResource(asset: asset) as? T {
                     acc.append(object)
                 }
             case .video:
                 if let object = Video(asset: asset) as? T {
                     acc.append(object)
-                } else if let object = BaseGalleryObject(asset: asset) as? T {
+                } else if let object = AnyResource(asset: asset) as? T {
                     acc.append(object)
                 }
             default: break
@@ -109,13 +155,11 @@ open class Album<T: BaseGalleryObject> {
         
         return acc
     }
-    
-    
-    func fetchResultChanged(_ newFetchResult: PHFetchResult<PHAsset>) {
-        self.fetchResult = newFetchResult
-    }
 
 }
+
+
+// MARK: Library change observers
 
 class AlbumObserver: NSObject, PHPhotoLibraryChangeObserver {
     

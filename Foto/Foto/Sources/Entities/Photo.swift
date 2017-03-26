@@ -61,13 +61,16 @@ public enum BurstSelectionType {
 }
 
 
-open class Photo: BaseGalleryObject {
+open class Photo: AnyResource {
 
     public struct BurstInfo {
         let representsBurst: Bool
         let burstIdentifier: String?
         let burstSelectionTypes: BurstSelectionType
     }
+    
+    
+    override public class var mediaType: PHAssetMediaType { return .image }
     
     
     lazy public var subtypes: [PhotoSubtype] = {

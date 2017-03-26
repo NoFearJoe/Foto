@@ -33,8 +33,11 @@ enum VideoSubtype {
 }
 
 
-open class Video: BaseGalleryObject {
+open class Video: AnyResource {
 
+    override public class var mediaType: PHAssetMediaType { return .video }
+    
+    
     lazy var subtypes: [VideoSubtype] = {
         return VideoSubtype.subtypes(from: self.asset.mediaSubtypes)
     }()
