@@ -33,24 +33,41 @@ public enum AlbumType {
     
 }
 
+
+public enum AlbumState {
+    
+    public enum ActionType {
+        case deletion
+        case fetching
+        case saving
+    }
+    
+    case process(type: ActionType)
+    case idle
+}
+
+
 // MARK: Album
 
 open class Album<T: AnyResource> {
 
-    let assetCollection: PHAssetCollection?
+    var assetCollection: PHAssetCollection?
     let albumType: AlbumType
     
     var objects: [T] = [] {
         didSet {
+            state = .idle
+
             objectsRetrieved?(objects)
         }
     }
     
     
     public var objectsRetrieved: (([T]) -> Void)?
+    public var stateChanged: ((AlbumState) -> Void)?
     
     
-    fileprivate let observer: AlbumFetchResultObserver<PHAsset>
+    fileprivate let observer: AlbumFetchResultObserver<PHAsset>!
     fileprivate var fetchResult: PHFetchResult<PHAsset>? {
         didSet {
             observer.fetchResult = self.fetchResult
@@ -60,6 +77,14 @@ open class Album<T: AnyResource> {
             self.objects = self.mapFetchResult(fetchResult: fetchResult)
         }
     }
+    
+    fileprivate var state: AlbumState = .idle {
+        didSet {
+            stateChanged?(state)
+        }
+    }
+    
+    fileprivate var lastFetchOptions: PHFetchOptions?
     
     fileprivate let queue: DispatchQueue = DispatchQueue(label: "com.mesterra.foto.fetch")
     
@@ -88,6 +113,21 @@ open class Album<T: AnyResource> {
     }
     
     
+    public class func createAlbum(title: String) {
+        let options = PHFetchOptions()
+        options.predicate = NSPredicate(format: "title = %@", title)
+        let assetCollection = PHAssetCollection.fetchAssetCollections(with: AlbumType.custom(title: title).collectionType,
+                                                                  subtype: .any,
+                                                                  options: options).firstObject
+        
+        if assetCollection == nil {
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: title)
+            }, completionHandler: nil)
+        }
+    }
+    
+    
     func fetchResultChanged(_ newFetchResult: PHFetchResult<PHAsset>) {
         queue.async { [weak self] in
             self?.fetchResult = newFetchResult
@@ -100,28 +140,43 @@ open class Album<T: AnyResource> {
 
 extension Album {
 
-    public func fetchByCreationDate(ascending: Bool = false) {
-        let options = PHFetchOptions()
-        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: ascending)]
-        if T.self != AnyResource.self {
-            options.predicate = NSPredicate(format: "mediaType == %d", T.mediaType.rawValue)
+    public func refetch() {
+        fetch { options -> PHFetchOptions? in
+            return self.lastFetchOptions
         }
-        
-        fetch(options: options)
+    }
+    
+    public func fetchByCreationDate(ascending: Bool = false) {
+        fetch { options -> PHFetchOptions? in
+            options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: ascending)]
+            
+            return options
+        }
     }
     
     
-    public func fetch(options: PHFetchOptions? = nil) {
+    public func fetch(with optionsClosure: @escaping (PHFetchOptions) -> PHFetchOptions?) {
         queue.async { [weak self] in
             guard let `self` = self else { return }
             
+            self.state = .process(type: .fetching)
+            
+            let defaultOptions = PHFetchOptions()
+            if T.self != AnyResource.self {
+                defaultOptions.predicate = NSPredicate(format: "mediaType == %d", T.mediaType.rawValue)
+            }
+            
+            let options = optionsClosure(defaultOptions)
+            
+            self.lastFetchOptions = options
+            
             switch self.albumType {
             case .composite:
+                self.fetchResult = PHAsset.fetchAssets(with: T.mediaType, options: options)
+            default:
                 if let collection = self.assetCollection {
                     self.fetchResult = PHAsset.fetchAssets(in: collection, options: options)
                 }
-            default:
-                self.fetchResult = PHAsset.fetchAssets(with: T.mediaType, options: options)
             }
         }
     }
@@ -154,6 +209,77 @@ extension Album {
         })
         
         return acc
+    }
+
+}
+
+// MARK: Object deletion
+
+extension Album {
+
+    public func remove(objects: [T]) {
+        state = .process(type: .deletion)
+
+        PHPhotoLibrary.shared().performChanges({ () -> Void in
+            PHAssetChangeRequest.deleteAssets(objects as NSFastEnumeration)
+        }, completionHandler: { [weak self] (success, error) -> Void in
+//            self?.refetch()
+        })
+    }
+    
+    public func remove(object: T) {
+        remove(objects: [object])
+    }
+    
+    public func remove(by index: Int) {
+        if objects.indices.contains(index) {
+            let object = objects[index]
+            remove(object: object)
+        }
+    }
+    
+    public func removeAll(by indexes: [Int]) {
+        let objects: [T] = indexes.flatMap { index in
+            if self.objects.indices.contains(index) {
+                return self.objects[index]
+            }
+            return nil
+        }
+        
+        remove(objects: objects)
+    }
+
+}
+
+// MARK: Object saving
+
+extension Album {
+
+    public func saveImage(data: Data) {
+        state = .process(type: .saving)
+        
+        switch albumType {
+        case .custom:
+            PHPhotoLibrary.shared().performChanges({ [weak self] () -> Void in
+                if let image = UIImage(data: data) {
+                    let assetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
+                    assetRequest.creationDate = Date()
+                    let assetPlaceholder = assetRequest.placeholderForCreatedAsset
+                    if let assets = self?.fetchResult {
+                        if let collection = self?.assetCollection {
+                            let albumChangeRequest = PHAssetCollectionChangeRequest(for: collection, assets: assets)
+                            if let placeholder = assetPlaceholder {
+                                albumChangeRequest?.addAssets([placeholder] as NSFastEnumeration)
+                            }
+                        }
+                    }
+                }
+            }, completionHandler: nil)
+        default:
+            PHPhotoLibrary.shared().performChanges({ () -> Void in
+                PHAssetCreationRequest.forAsset().addResource(with: PHAssetResourceType.fullSizePhoto, data: data, options: nil)
+            }, completionHandler: nil)
+        }
     }
 
 }
