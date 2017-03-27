@@ -61,6 +61,7 @@ public enum BurstSelectionType {
 }
 
 
+/// Class that represents Photo object
 open class Photo: AnyResource {
 
     public struct BurstInfo {
@@ -72,11 +73,12 @@ open class Photo: AnyResource {
     
     override public class var mediaType: PHAssetMediaType { return .image }
     
-    
+    /// Subtypes of Photo. For example, Screenshot or HDR
     lazy public var subtypes: [PhotoSubtype] = {
         return PhotoSubtype.subtypes(from: self.asset.mediaSubtypes)
     }()
     
+    /// Information about burst photo sequense
     lazy public var burstInfo: BurstInfo = {
         return BurstInfo(representsBurst: self.asset.representsBurst,
                          burstIdentifier: self.asset.burstIdentifier,
@@ -90,7 +92,17 @@ open class Photo: AnyResource {
 
 public extension Photo {
 
-    public func loadImage(size: CGSize, contentMode: PHImageContentMode = .default, completion: @escaping (UIImage?) -> Void) {
+    /**
+     Requests image with specified size and content mode
+     
+     - Parameter size: Target size of image
+     - Parameter contentMode: Content mode of image. Default is .aspectFit
+     - Parameter completion: Completion closure
+     - Parameter image: Loaded image or nil
+     */
+    public func loadImage(size: CGSize,
+                          contentMode: PHImageContentMode = .default,
+                          completion: @escaping (_ image: UIImage?) -> Void) {
         let requestOptions = PHImageRequestOptions()
         requestOptions.version = .current
         requestOptions.deliveryMode = .opportunistic
@@ -113,7 +125,13 @@ public extension Photo {
         }
     }
     
-    public func loadImageData(completion: @escaping (Data?) -> Void) {
+    /**
+     Requests image data
+     
+     - Parameter completion: Completion closure
+     - Parameter data: Loaded data or nil
+     */
+    public func loadImageData(completion: @escaping (_ data: Data?) -> Void) {
         let requestOptions = PHImageRequestOptions()
         requestOptions.version = .current
         requestOptions.deliveryMode = .opportunistic
@@ -134,8 +152,18 @@ public extension Photo {
         }
     }
     
+    /**
+     Requests live photo with specified size and content mode
+     
+     - Parameter size: Target size of live photo
+     - Parameter contentMode: Content mode of live photo. Default is .aspectFit
+     - Parameter completion: Completion closure
+     - Parameter image: Loaded live photo or nil
+     */
     @available(iOS 9.1, *)
-    public func loadLivePhoto(size: CGSize, contentMode: PHImageContentMode = .default, completion: @escaping (PHLivePhoto?) -> Void) {
+    public func loadLivePhoto(size: CGSize,
+                              contentMode: PHImageContentMode = .default,
+                              completion: @escaping (_ photo: PHLivePhoto?) -> Void) {
         let requestOptions = PHLivePhotoRequestOptions()
         requestOptions.version = .current
         requestOptions.deliveryMode = .opportunistic
