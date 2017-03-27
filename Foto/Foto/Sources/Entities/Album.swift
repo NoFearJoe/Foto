@@ -10,9 +10,16 @@ import Photos
 
 
 public enum AlbumType {
+    
+    /// Album with a certain type of data. For example, album with all photos.
     case composite
+    
+    /// System album. For example, Faces or iCloud
     case system(subtype: PHAssetCollectionSubtype)
+    
+    /// User album. IMPORTANT: use Album.craete(title: completion:) before calling Album.init, otherwise data will not be fetched
     case custom(title: String)
+    
     
     var collectionType: PHAssetCollectionType {
         switch self {
@@ -33,7 +40,7 @@ public enum AlbumType {
     
 }
 
-
+/// A state indicating the presence or absence of actions performed with the album
 public enum AlbumState {
     
     public enum ActionType {
@@ -51,20 +58,44 @@ public enum AlbumState {
         
     }
     
-    case process(type: ActionType)
-    case idle
+    case action(type: ActionType)
+    case noActions
     
     var description: String {
         switch self {
-        case .idle: return "Idle"
-        case .process(let type): return type.description
+        case .noActions: return "No actions"
+        case .action(let type): return type.description
         }
     }
     
 }
 
+extension AlbumState: Equatable {
 
-// MARK: Album
+    public static func ==(lhs: AlbumState, rhs: AlbumState) -> Bool {
+        switch (lhs, rhs) {
+        case (.noActions, .noActions): return true
+        case (.action(let type1), .action(let type2)): return type1 == type2
+        default: return false
+        }
+    }
+
+}
+
+extension AlbumState.ActionType: Equatable {
+
+    public static func ==(lhs: AlbumState.ActionType, rhs: AlbumState.ActionType) -> Bool {
+        switch (lhs, rhs) {
+        case (.deletion, .deletion), (.fetching, .fetching), (.saving, .saving): return true
+        default: return false
+        }
+    }
+
+}
+
+
+
+// MARK: - Album
 
 open class Album<T: AnyResource> {
 
@@ -73,14 +104,19 @@ open class Album<T: AnyResource> {
     
     var objects: [T] = [] {
         didSet {
-            state = .idle
+            state = .noActions
 
-            objectsRetrieved?(objects)
+            DispatchQueue.main.async { [weak self] in
+                guard let `self` = self else { return }
+                self.objectsRetrieved?(self.objects)
+            }
         }
     }
     
-    
+    /// Called when new objects was retrieved. Performs in main queue
     public var objectsRetrieved: (([T]) -> Void)?
+    
+    /// Called when state was changed. Performs in main queue
     public var stateChanged: ((AlbumState) -> Void)?
     
     
@@ -95,9 +131,14 @@ open class Album<T: AnyResource> {
         }
     }
     
-    fileprivate var state: AlbumState = .idle {
+    fileprivate var state: AlbumState = .noActions {
         didSet {
-            stateChanged?(state)
+            if oldValue != state {
+                DispatchQueue.main.async { [weak self] in
+                    guard let `self` = self else { return }
+                    self.stateChanged?(self.state)
+                }
+            }
         }
     }
     
@@ -106,8 +147,15 @@ open class Album<T: AnyResource> {
     fileprivate let queue: DispatchQueue = DispatchQueue(label: "com.mesterra.foto.fetch")
     
     
-    public init(albumType: AlbumType) {
-        self.albumType = albumType
+    /**
+     Creates new instanse of Album with specified album type. 
+     
+     IMPORTANT: if you pass AlbumType.custom, you need to call Album.craete(title: completion:) before calling this initializer.
+     
+     - Parameter type: Type of album
+     */
+    public init(type: AlbumType) {
+        self.albumType = type
         
         switch albumType {
         case .composite:
@@ -130,7 +178,19 @@ open class Album<T: AnyResource> {
     }
     
     
-    public class func createAlbum(title: String, completion: @escaping (Bool, Error?) -> Void) {
+    /**
+     Create new album with specified title. Type of this album will be AlbumType.custom.
+     
+     Call this method before Album(init: .custom(title: "some")).
+     
+     If album is already created nothing will happen
+     
+     - Parameter title: Title of album
+     - Parameter completion: Completion closure
+     - Parameter success: Returns true if an album was created successfully
+     - Parameter error: Error
+     */
+    public class func create(title: String, completion: @escaping (_ success: Bool, _ error: Error?) -> Void) {
         let options = PHFetchOptions()
         options.predicate = NSPredicate(format: "title = %@", title)
         let assetCollection = PHAssetCollection.fetchAssetCollections(with: AlbumType.custom(title: title).collectionType,
@@ -157,16 +217,24 @@ open class Album<T: AnyResource> {
 
 }
 
-// MARK: Fetching
+// MARK: - Fetching
 
 extension Album {
 
+    /**
+     Performs last fetch
+     */
     public func refetch() {
         fetch { options -> PHFetchOptions? in
             return self.lastFetchOptions
         }
     }
     
+    /**
+     Performs fetch of object with sorting by creation date
+     
+     - Parameter ascending: If true, objects starts with earliest date. Default false
+     */
     public func fetchByCreationDate(ascending: Bool = false) {
         fetch { options -> PHFetchOptions? in
             options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: ascending)]
@@ -175,12 +243,17 @@ extension Album {
         }
     }
     
-    
-    public func fetch(with optionsClosure: @escaping (PHFetchOptions) -> PHFetchOptions?) {
+    /**
+     Performs fetch with specified fetch options
+     
+     - Parameter optionsClosure: Provide default options for fetch request and returns final options
+     - Parameter options: Default options for fetch request
+     */
+    public func fetch(with optionsClosure: @escaping (_ options: PHFetchOptions) -> PHFetchOptions?) {
         queue.async { [weak self] in
             guard let `self` = self else { return }
             
-            self.state = .process(type: .fetching)
+            self.state = .action(type: .fetching)
             
             let defaultOptions = PHFetchOptions()
             if T.self != AnyResource.self {
@@ -204,7 +277,7 @@ extension Album {
 
 }
 
-// MARK: Fetch result mapping
+// MARK: - Fetch result mapping
 
 extension Album {
 
@@ -234,27 +307,42 @@ extension Album {
 
 }
 
-// MARK: Object deletion
+// MARK: - Object deletion
 
 extension Album: AnyResourceStore {
     
+    /**
+     Removes array of objects
+     
+     - Parameter objects: Array of objects to delete
+     */
     public func remove(objects: [AnyResource]) {
-        state = .process(type: .deletion)
+        state = .action(type: .deletion)
 
         PHPhotoLibrary.shared().performChanges({ () -> Void in
             let assets = objects.map { $0.asset }
             PHAssetChangeRequest.deleteAssets(assets as NSFastEnumeration)
         }, completionHandler: { [weak self] (success, error) -> Void in
             if !success {
-                self?.state = .idle
+                self?.state = .noActions
             }
         })
     }
     
+    /**
+     Removes an object
+     
+     - Parameter object: Object to delete
+     */
     public func remove(object: AnyResource) {
         remove(objects: [object])
     }
     
+    /**
+     Removes an object at index
+     
+     - Parameter index: Index of object
+     */
     public func remove(by index: Int) {
         if objects.indices.contains(index) {
             let object = objects[index]
@@ -262,6 +350,11 @@ extension Album: AnyResourceStore {
         }
     }
     
+    /**
+     Removes an object at indexes
+     
+     - Parameter indexes: Indexes of objects
+     */
     public func removeAll(by indexes: [Int]) {
         let objects: [T] = indexes.flatMap { index in
             if self.objects.indices.contains(index) {
@@ -275,15 +368,21 @@ extension Album: AnyResourceStore {
 
 }
 
-// MARK: Object saving
+// MARK: - Object saving
 
 extension Album {
 
+    /**
+     Saves Data as image. If you pass no image data, nothing will happen
+     
+     - Parameter data: Image data
+     */
     public func saveImage(data: Data) {
-        state = .process(type: .saving)
+        state = .action(type: .saving)
         
         switch albumType {
         case .custom:
+            // TODO: Test cases if data is not an image
             PHPhotoLibrary.shared().performChanges({ [weak self] () -> Void in
                 if let image = UIImage(data: data) {
                     let assetRequest = PHAssetChangeRequest.creationRequestForAsset(from: image)
@@ -298,13 +397,17 @@ extension Album {
                         }
                     }
                 }
-            }, completionHandler: nil)
+            }, completionHandler: { [weak self] (success, error) -> Void in
+                if !success {
+                    self?.state = .noActions
+                }
+            })
         default:
             PHPhotoLibrary.shared().performChanges({ () -> Void in
                 PHAssetCreationRequest.forAsset().addResource(with: PHAssetResourceType.fullSizePhoto, data: data, options: nil)
             }, completionHandler: { [weak self] (success, error) -> Void in
                 if !success {
-                    self?.state = .idle
+                    self?.state = .noActions
                 }
             })
         }
@@ -313,7 +416,7 @@ extension Album {
 }
 
 
-// MARK: Library change observers
+// MARK: - Library change observers
 
 class AlbumObserver: NSObject, PHPhotoLibraryChangeObserver {
     
