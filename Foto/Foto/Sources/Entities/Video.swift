@@ -33,26 +33,37 @@ enum VideoSubtype {
 }
 
 
+// MARK: - Video
+
 open class Video: AnyResource {
 
     override public class var mediaType: PHAssetMediaType { return .video }
     
-    
+    /// Subtypes of Video. For example, Timelapsed or Streamed
     lazy var subtypes: [VideoSubtype] = {
         return VideoSubtype.subtypes(from: self.asset.mediaSubtypes)
     }()
     
+    /// Video duration
     lazy var duration: TimeInterval = {
         return self.asset.duration
     }()
 
 }
 
-// MARK: Content loading
+// MARK: - Content loading
 
 extension Video {
  
-    func loadVideo(quality: PHVideoRequestOptionsDeliveryMode = .automatic, completion: @escaping (AVPlayerItem?) -> Void) {
+    /**
+     Requests video with specified queality
+     
+     - Parameter quelity: Target quality of video
+     - Parameter completion: Completion closure
+     - Parameter playerItem: Loaded player item or nil
+     */
+    func loadVideo(quality: PHVideoRequestOptionsDeliveryMode = .automatic,
+                   completion: @escaping (_ item: AVPlayerItem?) -> Void) {
         let requestOptions = PHVideoRequestOptions()
         requestOptions.version = .current
         requestOptions.deliveryMode = quality

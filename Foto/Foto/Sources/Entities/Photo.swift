@@ -60,6 +60,7 @@ public enum BurstSelectionType {
     
 }
 
+// MARK: - Photo
 
 /// Class that represents Photo object
 open class Photo: AnyResource {
@@ -88,7 +89,7 @@ open class Photo: AnyResource {
 }
 
 
-// MARK: Content loading
+// MARK: - Content loading
 
 public extension Photo {
 
