@@ -9,7 +9,7 @@
 import Photos
 
 
-enum ResourceSource {
+public enum ResourceSource {
     case library
     case cloud
     case iTunes
@@ -24,24 +24,26 @@ enum ResourceSource {
         }
     }
     
-    var canDelete: Bool {
+    public var canDelete: Bool {
         return self != .iTunes
     }
     
-    var canEdit: Bool {
+    public var canEdit: Bool {
         return self == .library
     }
     
 }
 
 
-public protocol AnyResourceStore {
+protocol AnyResourceStore {
     func remove(object: AnyResource)
 }
 
 
+// MARK: - Any resource
+
 /// Base class of gallery object.
-open class AnyResource {
+public class AnyResource {
 
     public class var mediaType: PHAssetMediaType { return .unknown }
     
@@ -64,58 +66,66 @@ open class AnyResource {
 
 
     /// Source of object
-    lazy var source: ResourceSource = {
+    lazy public var source: ResourceSource = {
         return ResourceSource(sourceType: self.asset.sourceType)
     }()
     
     /// Pixel size of object
-    lazy var size: CGSize = {
+    lazy public var size: CGSize = {
         return CGSize(width: self.asset.pixelWidth, height: self.asset.pixelHeight)
     }()
     
     /// Creation date of object
-    lazy var creationDate: Date? = {
+    lazy public var creationDate: Date? = {
         return self.asset.creationDate
     }()
     
     /// Modification date of object
-    lazy var modificationDate: Date? = {
+    lazy public var modificationDate: Date? = {
         return self.asset.modificationDate
     }()
     
     /// The location saved with the object
-    lazy var location: CLLocation? = {
+    lazy public var location: CLLocation? = {
         return self.asset.location
     }()
     
     /// A boolean value that indicates whether the user has hidden the object
-    lazy var isHidden: Bool = {
+    lazy public var isHidden: Bool = {
         return self.asset.isHidden
     }()
     
     /// A Boolean value that indicates whether the user has marked the asset as a favorite
-    lazy var isFavorite: Bool = {
+    lazy public var isFavorite: Bool = {
         return self.asset.isFavorite
     }()
 
 }
 
-// MARK: Object methods
+// MARK: - Object methods
 
 extension AnyResource {
 
-    open func canPerform(_ editOperation: PHAssetEditOperation) -> Bool {
+    /**
+     Checks that operation can be performed
+     
+     - Parameter editOperation: Operation
+     */
+    public func canPerform(_ editOperation: PHAssetEditOperation) -> Bool {
         return asset.canPerform(editOperation)
     }
     
-    open func remove() {
+    /**
+     Removes itself
+     */
+    public func remove() {
         store.remove(object: self)
     }
 
 }
 
 
-// MARK: Pending requests managing
+// MARK: - Pending requests managing
 
 extension AnyResource {
 
@@ -137,11 +147,11 @@ extension AnyResource {
 
 }
 
-// MARK: Load request cancellation
+// MARK: - Load request cancellation
 
 extension AnyResource {
     
-    func cancelLastRequest() {
+    public func cancelLastRequest() {
         performPendignRequestsChange {
             guard let lastRequestID = pendingRequests.last else { return }
             

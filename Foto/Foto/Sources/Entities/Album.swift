@@ -97,7 +97,7 @@ extension AlbumState.ActionType: Equatable {
 
 // MARK: - Album
 
-open class Album<T: AnyResource> {
+public class Album<T: AnyResource> {
 
     var assetCollection: PHAssetCollection?
     let albumType: AlbumType
@@ -219,7 +219,7 @@ open class Album<T: AnyResource> {
 
 // MARK: - Fetching
 
-extension Album {
+public extension Album {
 
     /**
      Performs last fetch
@@ -279,7 +279,7 @@ extension Album {
 
 // MARK: - Fetch result mapping
 
-extension Album {
+public extension Album {
 
     func mapFetchResult(fetchResult: PHFetchResult<PHAsset>) -> [T] {
         var acc: [T] = []
@@ -312,6 +312,19 @@ extension Album {
 extension Album: AnyResourceStore {
     
     /**
+     Removes an object
+     
+     - Parameter object: Object to delete
+     */
+    public func remove(object: AnyResource) {
+        remove(objects: [object])
+    }
+    
+}
+
+public extension Album {
+    
+    /**
      Removes array of objects
      
      - Parameter objects: Array of objects to delete
@@ -329,14 +342,7 @@ extension Album: AnyResourceStore {
         })
     }
     
-    /**
-     Removes an object
-     
-     - Parameter object: Object to delete
-     */
-    public func remove(object: AnyResource) {
-        remove(objects: [object])
-    }
+    
     
     /**
      Removes an object at index
@@ -370,7 +376,7 @@ extension Album: AnyResourceStore {
 
 // MARK: - Object saving
 
-extension Album {
+public extension Album {
 
     /**
      Saves Data as image. If you pass no image data, nothing will happen

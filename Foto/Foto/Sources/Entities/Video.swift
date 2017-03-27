@@ -9,7 +9,7 @@
 import Photos
 
 
-enum VideoSubtype {
+public enum VideoSubtype {
     case streamed
     case highFrameRate
     case timelapsed
@@ -35,17 +35,17 @@ enum VideoSubtype {
 
 // MARK: - Video
 
-open class Video: AnyResource {
+public class Video: AnyResource {
 
     override public class var mediaType: PHAssetMediaType { return .video }
     
     /// Subtypes of Video. For example, Timelapsed or Streamed
-    lazy var subtypes: [VideoSubtype] = {
+    lazy public var subtypes: [VideoSubtype] = {
         return VideoSubtype.subtypes(from: self.asset.mediaSubtypes)
     }()
     
     /// Video duration
-    lazy var duration: TimeInterval = {
+    lazy public var duration: TimeInterval = {
         return self.asset.duration
     }()
 
@@ -53,7 +53,7 @@ open class Video: AnyResource {
 
 // MARK: - Content loading
 
-extension Video {
+public extension Video {
  
     /**
      Requests video with specified queality
@@ -62,7 +62,7 @@ extension Video {
      - Parameter completion: Completion closure
      - Parameter playerItem: Loaded player item or nil
      */
-    func loadVideo(quality: PHVideoRequestOptionsDeliveryMode = .automatic,
+    public func loadVideo(quality: PHVideoRequestOptionsDeliveryMode = .automatic,
                    completion: @escaping (_ item: AVPlayerItem?) -> Void) {
         let requestOptions = PHVideoRequestOptions()
         requestOptions.version = .current

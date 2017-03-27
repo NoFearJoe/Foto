@@ -63,7 +63,7 @@ public enum BurstSelectionType {
 // MARK: - Photo
 
 /// Class that represents Photo object
-open class Photo: AnyResource {
+public class Photo: AnyResource {
 
     public struct BurstInfo {
         let representsBurst: Bool
