@@ -9,11 +9,12 @@
 /* Begin PBXBuildFile section */
 		96744C181E86FCC30057F305 /* Foto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96744C0E1E86FCC30057F305 /* Foto.framework */; };
 		96744C1D1E86FCC30057F305 /* FotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C1C1E86FCC30057F305 /* FotoTests.swift */; };
-		96744C1F1E86FCC30057F305 /* Foto.h in Headers */ = {isa = PBXBuildFile; fileRef = 96744C111E86FCC30057F305 /* Foto.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		96744C2B1E86FFD20057F305 /* AnyResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2A1E86FFD20057F305 /* AnyResource.swift */; };
-		96744C2D1E8702450057F305 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2C1E8702450057F305 /* Photo.swift */; };
-		96744C2F1E8707550057F305 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C2E1E8707550057F305 /* Video.swift */; };
-		96744C311E878AAC0057F305 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C301E878AAC0057F305 /* Album.swift */; };
+		96744C621E8906AE0057F305 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C5E1E8906AE0057F305 /* Album.swift */; };
+		96744C631E8906AE0057F305 /* AnyResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C5F1E8906AE0057F305 /* AnyResource.swift */; };
+		96744C641E8906AE0057F305 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C601E8906AE0057F305 /* Photo.swift */; };
+		96744C651E8906AE0057F305 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96744C611E8906AE0057F305 /* Video.swift */; };
+		96744C671E8907A20057F305 /* Foto.h in Headers */ = {isa = PBXBuildFile; fileRef = 96744C661E8907A20057F305 /* Foto.h */; };
+		96744C691E89081B0057F305 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 96744C681E89081B0057F305 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,15 +29,15 @@
 
 /* Begin PBXFileReference section */
 		96744C0E1E86FCC30057F305 /* Foto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Foto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		96744C111E86FCC30057F305 /* Foto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Foto.h; sourceTree = "<group>"; };
-		96744C121E86FCC30057F305 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96744C171E86FCC30057F305 /* FotoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FotoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96744C1C1E86FCC30057F305 /* FotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FotoTests.swift; sourceTree = "<group>"; };
 		96744C1E1E86FCC30057F305 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		96744C2A1E86FFD20057F305 /* AnyResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyResource.swift; sourceTree = "<group>"; };
-		96744C2C1E8702450057F305 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
-		96744C2E1E8707550057F305 /* Video.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
-		96744C301E878AAC0057F305 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		96744C5E1E8906AE0057F305 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		96744C5F1E8906AE0057F305 /* AnyResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyResource.swift; sourceTree = "<group>"; };
+		96744C601E8906AE0057F305 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		96744C611E8906AE0057F305 /* Video.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
+		96744C661E8907A20057F305 /* Foto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Foto.h; sourceTree = "<group>"; };
+		96744C681E89081B0057F305 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +81,8 @@
 			isa = PBXGroup;
 			children = (
 				96744C281E86FD4E0057F305 /* Sources */,
-				96744C111E86FCC30057F305 /* Foto.h */,
-				96744C121E86FCC30057F305 /* Info.plist */,
+				96744C661E8907A20057F305 /* Foto.h */,
+				96744C681E89081B0057F305 /* Info.plist */,
 			);
 			path = Foto;
 			sourceTree = "<group>";
@@ -98,20 +99,12 @@
 		96744C281E86FD4E0057F305 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				96744C291E86FEB90057F305 /* Entities */,
+				96744C5E1E8906AE0057F305 /* Album.swift */,
+				96744C5F1E8906AE0057F305 /* AnyResource.swift */,
+				96744C601E8906AE0057F305 /* Photo.swift */,
+				96744C611E8906AE0057F305 /* Video.swift */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		96744C291E86FEB90057F305 /* Entities */ = {
-			isa = PBXGroup;
-			children = (
-				96744C2A1E86FFD20057F305 /* AnyResource.swift */,
-				96744C2C1E8702450057F305 /* Photo.swift */,
-				96744C2E1E8707550057F305 /* Video.swift */,
-				96744C301E878AAC0057F305 /* Album.swift */,
-			);
-			path = Entities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -121,7 +114,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96744C1F1E86FCC30057F305 /* Foto.h in Headers */,
+				96744C671E8907A20057F305 /* Foto.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,6 +203,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96744C691E89081B0057F305 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,10 +221,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96744C2D1E8702450057F305 /* Photo.swift in Sources */,
-				96744C2F1E8707550057F305 /* Video.swift in Sources */,
-				96744C2B1E86FFD20057F305 /* AnyResource.swift in Sources */,
-				96744C311E878AAC0057F305 /* Album.swift in Sources */,
+				96744C641E8906AE0057F305 /* Photo.swift in Sources */,
+				96744C651E8906AE0057F305 /* Video.swift in Sources */,
+				96744C631E8906AE0057F305 /* AnyResource.swift in Sources */,
+				96744C621E8906AE0057F305 /* Album.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,13 +356,15 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Foto/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Foto/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mesterra.Foto;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(SWIFT_MODULE_NAME)-Swift.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
@@ -384,13 +380,15 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Foto/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Foto/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mesterra.Foto;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(SWIFT_MODULE_NAME)-Swift.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
