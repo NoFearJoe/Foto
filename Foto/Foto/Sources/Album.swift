@@ -442,7 +442,7 @@ class AlbumObserver: NSObject, PHPhotoLibraryChangeObserver {
         guard let collection = assetCollection else { return }
         guard let changes = changeInstance.changeDetails(for: collection) else { return }
         
-        if let newAssetCollection = changes.objectAfterChanges as? PHAssetCollection {
+        if let newAssetCollection = changes.objectAfterChanges {
             assetCollectionChanged?(newAssetCollection)
         }
     }

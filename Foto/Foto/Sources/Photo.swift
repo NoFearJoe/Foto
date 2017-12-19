@@ -98,15 +98,17 @@ public extension Photo {
      
      - Parameter size: Target size of image
      - Parameter contentMode: Content mode of image. Default is .aspectFit
+     - Parameter deliveryMode: Delivery mode
      - Parameter completion: Completion closure
      - Parameter image: Loaded image or nil
      */
     public func loadImage(size: CGSize,
                           contentMode: PHImageContentMode = .default,
+                          deliveryMode: PHImageRequestOptionsDeliveryMode = .opportunistic,
                           completion: @escaping (_ image: UIImage?) -> Void) {
         let requestOptions = PHImageRequestOptions()
         requestOptions.version = .current
-        requestOptions.deliveryMode = .opportunistic
+        requestOptions.deliveryMode = deliveryMode
         requestOptions.isNetworkAccessAllowed = true
         requestOptions.isSynchronous = true
         

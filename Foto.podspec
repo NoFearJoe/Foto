@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/NoFearJoe'
   s.license = { :type => 'MIT' }
 
-  s.version = '0.2'
+  s.version = '0.3'
   s.source = { :git => 'https://github.com/NoFearJoe/Foto.git', :tag => s.version.to_s }
 
   s.platform = :ios

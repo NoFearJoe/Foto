@@ -70,6 +70,10 @@ public class AnyResource {
         return ResourceSource(sourceType: self.asset.sourceType)
     }()
     
+    lazy public var filename: String? = {
+        return self.asset.value(forKey: "filename") as? String
+    }()
+    
     /// Pixel size of object
     lazy public var size: CGSize = {
         return CGSize(width: self.asset.pixelWidth, height: self.asset.pixelHeight)
