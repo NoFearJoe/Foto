@@ -162,3 +162,17 @@ extension AnyResource {
     }
     
 }
+
+// MARK: - Hashable
+
+extension AnyResource: Hashable {
+    
+    public static func ==(lhs: AnyResource, rhs: AnyResource) -> Bool {
+        return lhs.asset == rhs.asset
+    }
+    
+    public var hashValue: Int {
+        return asset.hashValue
+    }
+    
+}
